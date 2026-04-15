@@ -3,53 +3,145 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>타로 리딩 룸</title>
+    <title>미스틱 아틀리에 | 타로 리딩 스튜디오</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <main class="container">
-      <header>
-        <h1>🔮 타로 리딩 룸</h1>
-        <p class="subtitle">카드를 섞고 펼친 뒤 직접 선택해 리딩을 진행하세요.</p>
-      </header>
+    <div class="bg-orb orb-1" aria-hidden="true"></div>
+    <div class="bg-orb orb-2" aria-hidden="true"></div>
 
-      <section class="card panel">
-        <h2>1) 리딩 방식 선택</h2>
-        <div class="spread-picker" id="spreadPicker">
-          <button class="spread-btn active" data-spread="one">원카드</button>
-          <button class="spread-btn" data-spread="three">3카드 (과거·현재·미래)</button>
-        </div>
+    <header class="site-header container">
+      <a class="brand" href="#top">✦ Mystic Atelier</a>
+      <nav class="top-nav" aria-label="주요 메뉴">
+        <a href="#about">소개</a>
+        <a href="#readingStudio">리딩</a>
+        <a href="#zodiac">12궁</a>
+        <a href="#stories">스토리</a>
+      </nav>
+    </header>
 
-        <h2>2) 리딩 분야 선택</h2>
-        <div class="category-picker" id="categoryPicker">
-          <button class="category-btn" data-category="love">연애</button>
-          <button class="category-btn" data-category="career">일·커리어</button>
-          <button class="category-btn" data-category="money">금전</button>
-          <button class="category-btn active" data-category="general">일반</button>
+    <main id="top">
+      <section class="hero container card-surface">
+        <p class="eyebrow">ULTIMATE GUIDE TO TAROT & ASTROLOGY</p>
+        <h1>당신의 흐름을 읽고, 오늘의 선택을 더 선명하게.</h1>
+        <p class="hero-copy">
+          직관적인 타로 리딩 경험과 미스틱한 콘텐츠를 한 공간에서 제공합니다.
+          지금 바로 한 장의 카드로 오늘의 메시지를 확인해보세요.
+        </p>
+        <div class="hero-actions">
+          <button id="startReadingBtn" class="btn btn-primary">리딩 시작하기</button>
+          <a class="btn btn-ghost" href="#about">서비스 소개 보기</a>
         </div>
-
-        <div class="action-row">
-          <button id="shuffleBtn">카드 섞고 펼치기</button>
-        </div>
-        <p id="instruction" class="instruction">리딩 방식을 고른 뒤 카드를 섞어주세요.</p>
       </section>
 
-      <section class="card panel" id="tablePanel" hidden>
-        <h2>3) 카드를 선택하세요</h2>
-        <div id="spreadSlots" class="spread-slots"></div>
-        <div id="deckArea" class="deck-area"></div>
+      <section id="about" class="container section">
+        <div class="section-head">
+          <p class="eyebrow">ABOUT THE EXPERIENCE</p>
+          <h2>단순 운세를 넘어, 자기성찰을 돕는 리딩 여정</h2>
+        </div>
+        <div class="feature-grid">
+          <article class="feature-card card-surface">
+            <h3>타로 리딩</h3>
+            <p>원카드/3카드 스프레드로 질문의 핵심을 빠르게 파악합니다.</p>
+          </article>
+          <article class="feature-card card-surface">
+            <h3>별자리 인사이트</h3>
+            <p>12궁 키워드로 성향과 관계 패턴을 가볍게 탐색할 수 있습니다.</p>
+          </article>
+          <article class="feature-card card-surface">
+            <h3>실행 힌트</h3>
+            <p>정/역방향 맥락을 바탕으로 오늘 적용 가능한 액션을 제안합니다.</p>
+          </article>
+        </div>
       </section>
 
-      <section class="card panel" id="resultPanel" hidden>
-        <h2>리딩 결과</h2>
-        <div id="result"></div>
+      <section id="readingStudio" class="container section card-surface reading-studio">
+        <div class="section-head">
+          <p class="eyebrow">INTERACTIVE READING STUDIO</p>
+          <h2>실시간 타로 리딩</h2>
+        </div>
+
+        <section class="panel">
+          <h3>1) 리딩 방식 선택</h3>
+          <div class="spread-picker" id="spreadPicker">
+            <button class="spread-btn active" data-spread="one">원카드</button>
+            <button class="spread-btn" data-spread="three">3카드 (과거·현재·미래)</button>
+          </div>
+
+          <h3>2) 리딩 분야 선택</h3>
+          <div class="category-picker" id="categoryPicker">
+            <button class="category-btn" data-category="love">연애</button>
+            <button class="category-btn" data-category="career">일·커리어</button>
+            <button class="category-btn" data-category="money">금전</button>
+            <button class="category-btn active" data-category="general">일반</button>
+          </div>
+
+          <div class="action-row">
+            <button id="shuffleBtn" class="btn btn-primary">카드 섞고 펼치기</button>
+          </div>
+          <p id="instruction" class="instruction">리딩 방식을 고른 뒤 카드를 섞어주세요.</p>
+        </section>
+
+        <section class="panel" id="tablePanel" hidden>
+          <h3>3) 카드를 선택하세요</h3>
+          <div id="spreadSlots" class="spread-slots"></div>
+          <div id="deckArea" class="deck-area"></div>
+        </section>
+
+        <section class="panel" id="resultPanel" hidden>
+          <h3>리딩 결과</h3>
+          <div id="result"></div>
+        </section>
       </section>
 
-      <section class="card panel">
-        <h2>최근 리딩</h2>
-        <ul id="history"></ul>
+      <section id="zodiac" class="container section">
+        <div class="section-head">
+          <p class="eyebrow">ZODIAC ENERGY</p>
+          <h2>12궁 키워드 한눈에 보기</h2>
+        </div>
+        <div class="zodiac-grid">
+          <article class="zodiac-card card-surface"><strong>♈ 양자리</strong><span>도전 · 추진력</span></article>
+          <article class="zodiac-card card-surface"><strong>♉ 황소자리</strong><span>안정 · 감각</span></article>
+          <article class="zodiac-card card-surface"><strong>♊ 쌍둥이자리</strong><span>소통 · 호기심</span></article>
+          <article class="zodiac-card card-surface"><strong>♋ 게자리</strong><span>보호 · 공감</span></article>
+          <article class="zodiac-card card-surface"><strong>♌ 사자자리</strong><span>표현 · 자신감</span></article>
+          <article class="zodiac-card card-surface"><strong>♍ 처녀자리</strong><span>분석 · 정돈</span></article>
+          <article class="zodiac-card card-surface"><strong>♎ 천칭자리</strong><span>균형 · 관계</span></article>
+          <article class="zodiac-card card-surface"><strong>♏ 전갈자리</strong><span>집중 · 변환</span></article>
+          <article class="zodiac-card card-surface"><strong>♐ 사수자리</strong><span>확장 · 탐험</span></article>
+          <article class="zodiac-card card-surface"><strong>♑ 염소자리</strong><span>책임 · 성취</span></article>
+          <article class="zodiac-card card-surface"><strong>♒ 물병자리</strong><span>혁신 · 독립</span></article>
+          <article class="zodiac-card card-surface"><strong>♓ 물고기자리</strong><span>직관 · 상상</span></article>
+        </div>
+      </section>
+
+      <section id="stories" class="container section split">
+        <article class="card-surface panel-lite">
+          <p class="eyebrow">TESTIMONIAL</p>
+          <h3>리딩 후기</h3>
+          <blockquote>
+            “막연했던 고민이 카드 메시지로 정리되니, 오늘 무엇부터 해야 할지 훨씬 명확해졌어요.”
+          </blockquote>
+          <p class="quote-author">— 사용자 K</p>
+        </article>
+
+        <article class="card-surface panel-lite">
+          <p class="eyebrow">RECENT READING</p>
+          <h3>최근 리딩 기록</h3>
+          <ul id="history"></ul>
+        </article>
       </section>
     </main>
+
+    <footer class="site-footer container card-surface">
+      <p class="newsletter-title">Mystic Letter</p>
+      <p>새로운 리딩 가이드와 콘텐츠 업데이트 소식을 받아보세요.</p>
+      <form class="newsletter-form" onsubmit="return false">
+        <input type="email" placeholder="이메일 주소" aria-label="이메일 주소" />
+        <button type="submit" class="btn btn-primary">구독</button>
+      </form>
+      <small>© <span id="currentYear"></span> Mystic Atelier. For self-reflection only.</small>
+    </footer>
 
     <script src="script.js"></script>
   </body>
