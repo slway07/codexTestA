@@ -55,6 +55,27 @@ const spreadMeta = {
   },
 };
 
+const slotFocus = {
+  one: {
+    upright: "지금 필요한 핵심 신호를 선명하게 보여줍니다.",
+    reversed: "현재 놓치고 있는 신호를 재점검하라는 뜻으로 볼 수 있습니다.",
+  },
+  three: [
+    {
+      upright: "과거의 경험이 현재의 선택에 유효한 기반이 되고 있습니다.",
+      reversed: "과거 이슈가 아직 정리되지 않아 현재 판단을 흔들 수 있습니다.",
+    },
+    {
+      upright: "지금의 방향성이 비교적 안정적이며 실행력이 중요합니다.",
+      reversed: "현재 국면은 속도보다 점검과 조율이 우선인 흐름입니다.",
+    },
+    {
+      upright: "가까운 미래에는 전개가 열릴 가능성이 높습니다.",
+      reversed: "미래 흐름은 변수 관리와 유연한 대응이 관건입니다.",
+    },
+  ],
+};
+
 const spreadPicker = document.getElementById("spreadPicker");
 const categoryPicker = document.getElementById("categoryPicker");
 const shuffleBtn = document.getElementById("shuffleBtn");
@@ -150,6 +171,8 @@ function buildResult() {
       const key = card.orientation === "정방향" ? "upright" : "reversed";
       const keywords = card[key];
       const baseMessage = templates[selectedCategory][key];
+      const focusMessage =
+        selectedSpread === "one" ? slotFocus.one[key] : slotFocus.three[idx]?.[key] ?? "";
 
       return `
         <article>
@@ -157,14 +180,37 @@ function buildResult() {
           <span class="tag">키워드: ${keywords[0]}</span>
           <span class="tag">키워드: ${keywords[1]}</span>
           <p>${baseMessage}</p>
+          <p>${focusMessage}</p>
         </article>
       `;
     })
     .join("");
 
+  const orientationScore = drawnCards.reduce(
+    (score, card) => score + (card.orientation === "정방향" ? 1 : -1),
+    0,
+  );
+  const overallTone =
+    orientationScore > 0
+      ? "흐름이 점진적으로 열리는 방향"
+      : orientationScore < 0
+        ? "속도 조절과 재정비가 필요한 방향"
+        : "기회와 경고가 공존하는 균형 구간";
+  const actionHint =
+    orientationScore > 0
+      ? "이미 맞는 방향이 보이니 작은 실행을 바로 시작해보세요."
+      : orientationScore < 0
+        ? "결정을 서두르기보다 우선순위를 다시 정리하고 한 단계씩 진행하세요."
+        : "확신이 드는 한 가지부터 실험하며 데이터를 쌓는 접근이 좋습니다.";
+  const conclusion =
+    selectedSpread === "three"
+      ? `과거(${drawnCards[0].ko})에서 이어진 흐름이 현재(${drawnCards[1].ko})를 거쳐 미래(${drawnCards[2].ko})로 연결됩니다. 전체적으로는 ${overallTone}입니다. ${actionHint}`
+      : `${drawnCards[0].ko}의 메시지를 중심으로 보면, 지금은 ${overallTone}입니다. ${actionHint}`;
+
   resultEl.innerHTML = `
     <p><strong>스프레드:</strong> ${selectedSpread === "one" ? "원카드" : "3카드 (과거·현재·미래)"}</p>
     ${cardBlocks}
+    <p class="result-conclusion"><strong>종합 결론:</strong> ${conclusion}</p>
     <p><strong>안내:</strong> 본 서비스는 자기성찰을 위한 참고용 콘텐츠입니다.</p>
   `;
   resultPanel.hidden = false;
