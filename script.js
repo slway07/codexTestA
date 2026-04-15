@@ -86,6 +86,9 @@ const deckAreaEl = document.getElementById("deckArea");
 const resultPanel = document.getElementById("resultPanel");
 const resultEl = document.getElementById("result");
 const historyEl = document.getElementById("history");
+const startReadingBtn = document.getElementById("startReadingBtn");
+const readingStudio = document.getElementById("readingStudio");
+const currentYearEl = document.getElementById("currentYear");
 
 let selectedSpread = "one";
 let selectedCategory = "general";
@@ -277,4 +280,15 @@ categoryPicker.addEventListener("click", (e) => {
 });
 
 shuffleBtn.addEventListener("click", startReading);
+
+if (startReadingBtn && readingStudio) {
+  startReadingBtn.addEventListener("click", () => {
+    readingStudio.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+}
+
+if (currentYearEl) {
+  currentYearEl.textContent = new Date().getFullYear();
+}
+
 renderHistory();
