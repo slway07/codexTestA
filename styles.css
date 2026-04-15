@@ -170,6 +170,14 @@ h2 {
   color: #5b21b6;
 }
 
+.result-conclusion {
+  margin-top: 14px;
+  padding: 12px;
+  border-radius: 10px;
+  background: rgba(139, 92, 246, 0.14);
+  border: 1px solid rgba(167, 139, 250, 0.5);
+}
+
 #history {
   padding-left: 18px;
   margin: 0;
