@@ -42,15 +42,43 @@ const templates = {
   },
 };
 
-const questionEl = document.getElementById("question");
-const categoryEl = document.getElementById("category");
-const drawBtn = document.getElementById("drawBtn");
+const spreadMeta = {
+  one: {
+    drawCount: 1,
+    slots: ["현재 메시지"],
+    guide: "원카드 리딩: 한 장에 집중해 오늘의 핵심 조언을 확인하세요.",
+  },
+  three: {
+    drawCount: 3,
+    slots: ["과거", "현재", "미래"],
+    guide: "3카드 리딩: 과거·현재·미래 흐름으로 상황 변화를 읽습니다.",
+  },
+};
+
+const spreadPicker = document.getElementById("spreadPicker");
+const categoryPicker = document.getElementById("categoryPicker");
+const shuffleBtn = document.getElementById("shuffleBtn");
+const instructionEl = document.getElementById("instruction");
+const tablePanel = document.getElementById("tablePanel");
+const spreadSlotsEl = document.getElementById("spreadSlots");
+const deckAreaEl = document.getElementById("deckArea");
 const resultPanel = document.getElementById("resultPanel");
 const resultEl = document.getElementById("result");
 const historyEl = document.getElementById("history");
 
-function pickRandom(items) {
-  return items[Math.floor(Math.random() * items.length)];
+let selectedSpread = "one";
+let selectedCategory = "general";
+let drawTarget = 1;
+let drawnCards = [];
+let currentDeck = [];
+
+function shuffle(array) {
+  const copied = [...array];
+  for (let i = copied.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copied[i], copied[j]] = [copied[j], copied[i]];
+  }
+  return copied;
 }
 
 function renderHistory() {
@@ -66,7 +94,7 @@ function renderHistory() {
 
   history.forEach((item) => {
     const li = document.createElement("li");
-    li.textContent = `${item.date} · ${item.card} (${item.orientation}) · ${item.category}`;
+    li.textContent = `${item.date} · ${item.spread} · ${item.cards} · ${item.category}`;
     historyEl.appendChild(li);
   });
 }
@@ -77,37 +105,130 @@ function saveHistory(entry) {
   localStorage.setItem("tarot_history", JSON.stringify(history.slice(0, 10)));
 }
 
-function drawCard() {
-  const question = questionEl.value.trim();
-  const category = categoryEl.value;
-  const card = pickRandom(tarotDeck);
-  const orientation = Math.random() < 0.5 ? "정방향" : "역방향";
-  const key = orientation === "정방향" ? "upright" : "reversed";
-  const keywords = card[key];
-  const baseMessage = templates[category][key];
-  const questionMessage = question
-    ? `질문("${question}") 기준으로 보면, 지금은 '${keywords[0]}' 키워드를 중심으로 판단하는 것이 좋습니다.`
-    : "질문을 입력하면 다음 리딩에서 더 맥락 있는 해석을 볼 수 있습니다.";
+function renderSlots() {
+  const slotNames = spreadMeta[selectedSpread].slots;
+  spreadSlotsEl.innerHTML = "";
+
+  slotNames.forEach((label, idx) => {
+    const slot = document.createElement("div");
+    slot.className = "slot";
+
+    const card = drawnCards[idx];
+    if (card) {
+      slot.classList.add("revealed");
+      slot.innerHTML = `
+        <strong>${label}</strong>
+        <div>${card.ko} (${card.name})</div>
+        <small>${card.orientation}</small>
+      `;
+    } else {
+      slot.innerHTML = `<strong>${label}</strong>카드를 선택해 이 자리를 채우세요.`;
+    }
+
+    spreadSlotsEl.appendChild(slot);
+  });
+}
+
+function renderDeck() {
+  deckAreaEl.innerHTML = "";
+
+  currentDeck.forEach((card, index) => {
+    const button = document.createElement("button");
+    button.className = `deck-card${card.picked ? " picked" : ""}`;
+    button.innerHTML = card.picked ? "선택됨" : "✦";
+    button.setAttribute("aria-label", `덱 카드 ${index + 1}`);
+
+    button.addEventListener("click", () => pickCard(index));
+    deckAreaEl.appendChild(button);
+  });
+}
+
+function buildResult() {
+  const slotNames = spreadMeta[selectedSpread].slots;
+  const cardBlocks = drawnCards
+    .map((card, idx) => {
+      const key = card.orientation === "정방향" ? "upright" : "reversed";
+      const keywords = card[key];
+      const baseMessage = templates[selectedCategory][key];
+
+      return `
+        <article>
+          <p class="result-title">${slotNames[idx]} · ${card.ko} (${card.name}) · ${card.orientation}</p>
+          <span class="tag">키워드: ${keywords[0]}</span>
+          <span class="tag">키워드: ${keywords[1]}</span>
+          <p>${baseMessage}</p>
+        </article>
+      `;
+    })
+    .join("");
 
   resultEl.innerHTML = `
-    <p class="result-title">${card.ko} (${card.name}) · ${orientation}</p>
-    <span class="tag">키워드: ${keywords[0]}</span>
-    <span class="tag">키워드: ${keywords[1]}</span>
-    <p>${baseMessage}</p>
-    <p>${questionMessage}</p>
+    <p><strong>스프레드:</strong> ${selectedSpread === "one" ? "원카드" : "3카드 (과거·현재·미래)"}</p>
+    ${cardBlocks}
     <p><strong>안내:</strong> 본 서비스는 자기성찰을 위한 참고용 콘텐츠입니다.</p>
   `;
-
   resultPanel.hidden = false;
 
+  const cardSummary = drawnCards.map((card) => `${card.ko}(${card.orientation})`).join(", ");
   saveHistory({
     date: new Date().toLocaleString("ko-KR"),
-    card: card.ko,
-    orientation,
-    category,
+    spread: selectedSpread === "one" ? "원카드" : "3카드",
+    cards: cardSummary,
+    category: selectedCategory,
   });
   renderHistory();
 }
 
-drawBtn.addEventListener("click", drawCard);
+function pickCard(index) {
+  const target = currentDeck[index];
+  if (!target || target.picked || drawnCards.length >= drawTarget) return;
+
+  target.picked = true;
+  const orientation = Math.random() < 0.5 ? "정방향" : "역방향";
+  drawnCards.push({ ...target, orientation });
+
+  renderDeck();
+  renderSlots();
+
+  if (drawnCards.length === drawTarget) {
+    instructionEl.textContent = "카드 선택 완료! 아래에서 리딩 결과를 확인하세요.";
+    buildResult();
+  } else {
+    instructionEl.textContent = `좋아요. 카드 ${drawTarget - drawnCards.length}장을 더 선택하세요.`;
+  }
+}
+
+function startReading() {
+  drawTarget = spreadMeta[selectedSpread].drawCount;
+  drawnCards = [];
+  currentDeck = shuffle(tarotDeck).map((card) => ({ ...card, picked: false }));
+
+  resultPanel.hidden = true;
+  tablePanel.hidden = false;
+  instructionEl.textContent = `${spreadMeta[selectedSpread].guide} 덱에서 ${drawTarget}장을 직접 선택하세요.`;
+
+  renderSlots();
+  renderDeck();
+}
+
+spreadPicker.addEventListener("click", (e) => {
+  const target = e.target.closest("button[data-spread]");
+  if (!target) return;
+
+  selectedSpread = target.dataset.spread;
+  spreadPicker.querySelectorAll("button").forEach((btn) => btn.classList.remove("active"));
+  target.classList.add("active");
+  instructionEl.textContent = `${spreadMeta[selectedSpread].guide} 카드를 섞어 시작하세요.`;
+});
+
+categoryPicker.addEventListener("click", (e) => {
+  const target = e.target.closest("button[data-category]");
+  if (!target) return;
+
+  selectedCategory = target.dataset.category;
+  categoryPicker.querySelectorAll("button").forEach((btn) => btn.classList.remove("active"));
+  target.classList.add("active");
+});
+
+shuffleBtn.addEventListener("click", startReading);
 renderHistory();
