@@ -3,29 +3,41 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>타로 MVP</title>
+    <title>타로 리딩 룸</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <main class="container">
       <header>
-        <h1>🔮 타로 MVP (No-LLM First)</h1>
-        <p class="subtitle">질문을 입력하고 카드를 뽑아 오늘의 메시지를 확인하세요.</p>
+        <h1>🔮 타로 리딩 룸</h1>
+        <p class="subtitle">카드를 섞고 펼친 뒤 직접 선택해 리딩을 진행하세요.</p>
       </header>
 
       <section class="card panel">
-        <label for="question">질문 (선택)</label>
-        <textarea id="question" rows="3" placeholder="예: 이번 달 이직 운이 궁금해요."></textarea>
+        <h2>1) 리딩 방식 선택</h2>
+        <div class="spread-picker" id="spreadPicker">
+          <button class="spread-btn active" data-spread="one">원카드</button>
+          <button class="spread-btn" data-spread="three">3카드 (과거·현재·미래)</button>
+        </div>
 
-        <label for="category">질문 카테고리</label>
-        <select id="category">
-          <option value="love">연애</option>
-          <option value="career">일·커리어</option>
-          <option value="money">금전</option>
-          <option value="general" selected>일반</option>
-        </select>
+        <h2>2) 리딩 분야 선택</h2>
+        <div class="category-picker" id="categoryPicker">
+          <button class="category-btn" data-category="love">연애</button>
+          <button class="category-btn" data-category="career">일·커리어</button>
+          <button class="category-btn" data-category="money">금전</button>
+          <button class="category-btn active" data-category="general">일반</button>
+        </div>
 
-        <button id="drawBtn">카드 뽑기</button>
+        <div class="action-row">
+          <button id="shuffleBtn">카드 섞고 펼치기</button>
+        </div>
+        <p id="instruction" class="instruction">리딩 방식을 고른 뒤 카드를 섞어주세요.</p>
+      </section>
+
+      <section class="card panel" id="tablePanel" hidden>
+        <h2>3) 카드를 선택하세요</h2>
+        <div id="spreadSlots" class="spread-slots"></div>
+        <div id="deckArea" class="deck-area"></div>
       </section>
 
       <section class="card panel" id="resultPanel" hidden>
